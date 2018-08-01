@@ -160,7 +160,12 @@ createRestaurantHTML = (restaurant) => {
 
   const image = document.createElement('img');
   image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  const img = DBHelper.imageUrlForRestaurant(restaurant);
+  var imgArr = img.split('.')
+  var img2x = imgArr[0] + '-800_2x.' + imgArr[1];
+  var img1x = imgArr[0] + '-400_1x.' + imgArr[1];
+  image.src = img1x;
+  image.srcset = `${img2x} 2x, ${img1x} 1x`
   image.alt = restaurant.name;
   li.append(image);
 
@@ -176,9 +181,12 @@ createRestaurantHTML = (restaurant) => {
   address.innerHTML = restaurant.address;
   li.append(address);
 
-  const more = document.createElement('a');
+  const more = document.createElement('button');
   more.innerHTML = 'View Details';
-  more.href = DBHelper.urlForRestaurant(restaurant);
+  more.onclick = function() {
+    window.location.href = DBHelper.urlForRestaurant(restaurant);
+  };
+  //more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
 
   return li
