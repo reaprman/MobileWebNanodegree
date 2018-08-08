@@ -19,17 +19,20 @@ var appCache = 'restaurant-cache';
                 'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js'
             ]);
          }).catch(function(err) {
-             console.log('Cache failed to load: ' + err);
+             console.log('Cache failed to load: ', err);
          })
      );
  });
 
+/*
+To debug fetch code
+url: https://developers.google.com/web/ilt/pwa/lab-caching-files-with-service-worker
+date: 08/04/18
+*/
 self.addEventListener('fetch', function(event) {
-  event.respondWith(
-     caches.match(event.request).then(function(response) {
-       return response || fetch(event.request);
-    })
-  );
+    event.respondWith(
+        caches.match(event.request).then(function(response){
+            return response || fetch(event.request);
+        })
+    );
 });
-
- 

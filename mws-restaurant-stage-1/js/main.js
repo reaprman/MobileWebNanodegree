@@ -158,6 +158,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
+  //changes for img section inspired by Project 1 MWS
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   const img = DBHelper.imageUrlForRestaurant(restaurant);
