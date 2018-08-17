@@ -12,20 +12,21 @@
 
 <body>
   <header>
+    <a href="#neighborhoods-select" class="skip-link">Skip to main content</a>
     <nav>
       <h1><a href="/">Restaurant Reviews</a></h1>
     </nav>
   </header>
 
   <main id="maincontent">
-    <section id="map-container">
+    <section id="map-container" role="application" aria-label="Leaflet map application">
       <div id="map"></div>
     </section>
     <section>
       <div class="filter-options">
         <h2>Filter Results</h2>
         <div class="filter-selects">
-          <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+          <select id="neighborhoods-select" name="neighborhoods" tabindex="-1" onchange="updateRestaurants()">
             <option value="all">All Neighborhoods</option>
           </select>
           <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">

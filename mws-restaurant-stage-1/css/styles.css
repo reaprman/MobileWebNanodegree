@@ -51,6 +51,19 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   text-align: center;
   text-transform: uppercase;
 }
+/* ====================== Skip Link ====================== */
+.skip-link{
+position: absolute;
+top: -80px;
+left: 0;
+background: #bd6807;
+color: white;
+padding: 8px;
+z-index: 100;
+}
+.skip-link:focus{
+top: 0;
+}
 /* ====================== Navigation ====================== */
 nav {
   max-width: 100%;
@@ -219,7 +232,7 @@ nav h1 a {
   width: 95.8%;
 }
 #restaurant-name {
-  color: #f18200;
+  color: #bd6807;
   font-family: Arial,sans-serif;
   font-size: 20pt;
   font-weight: 200;
