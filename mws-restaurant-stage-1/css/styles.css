@@ -1,7 +1,7 @@
 @charset "utf-8";
 /* CSS Document */
 
-/* changes to correct box sizing and side scrolling. */
+/* changes to correct box sizing and side scrolling. addtion of *:before and after included from Stackoverflow*/
 * , *:before, *:after{ 
   box-sizing:border-box; 
   -moz-box-sizing:border-box; 
