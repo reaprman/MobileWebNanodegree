@@ -14,7 +14,7 @@
 <body class="inside">
   <!-- Beginning header -->
   <header>
-    <a href="#restaurant-hrs-table" class="skip-link">Skip to main content</a>
+    <a href="#restaurant-hours" class="skip-link">Skip to main content</a>
     <!-- Beginning nav -->
     <nav>
       <h1>
@@ -42,14 +42,14 @@
         <img id="restaurant-img">
       </div>
       <p id="restaurant-cuisine"></p>
-      <p id="restaurant-address"></p>
+      <p id="restaurant-address" aria-label="address"></p>
       <!-- Beginning map -->
       <section id="map-container" role="application" aria-label="Leaflet map application">
         <div id="map"></div>
       </section>
       <!-- End map -->
-      <div id="restaurant-hrs-table" tabindex="-1">
-        <table id="restaurant-hours"></table>
+      <div id="restaurant-hrs-table">
+        <table id="restaurant-hours" aria-label="Operating Hours" tabindex="-1"></table>
       </div>
     </section>
     <!-- end restaurant -->
