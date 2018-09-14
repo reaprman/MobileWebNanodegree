@@ -8,15 +8,15 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    return `http://localhost:${port}/data/restaurants.json`;
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}/restaurants`;
   }
 
   /**
    * Fetch all restaurants.
    */
-  static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
+  static fetchRestaurants(callback, id) {
+    /* let xhr = new XMLHttpRequest();
     xhr.open('GET', DBHelper.DATABASE_URL);
     xhr.onload = () => {
       if (xhr.status === 200) { // Got a success response from server!
@@ -28,7 +28,21 @@ class DBHelper {
         callback(error, null);
       }
     };
-    xhr.send();
+    xhr.send(); */
+    let fetchURL;
+    if (!id) {
+      fetchURL = DBHelper.DATABASE_URL;
+    } else {
+      fetchURL = DBHelper.DATABASE_URL + '/' + id;
+    }
+    fetch(fetchURL).then(response => response.json())
+    .then(data => {
+      console.log("restaurants JSON: ", data) // added from Project supplied webinar to troubleshoot 10th image not displaying
+      return callback(null, data)})
+    .catch(err => {const error = (`Request failed. Returned ${err}`);
+    return callback(error, null);
+  })
+
   }
 
   /**
@@ -148,9 +162,10 @@ class DBHelper {
 
   /**
    * Restaurant image URL.
+   * Change needed for Rest Server as extension is no longer supplied
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+    return (`/img/${restaurant.id}.jpg`);
   }
 
   /**
