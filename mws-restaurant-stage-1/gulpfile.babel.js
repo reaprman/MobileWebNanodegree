@@ -49,9 +49,9 @@ gulp.task('sw', () => {
   });
   return b
   .transform(babelify)
-  .require("sw.js", {entry:true})
+  .require('app/sw.js', {entry:true})
   .bundle()
-  .pipe(source("sw.js"))
+  .pipe(source('sw.js'))
   .pipe(gulp.dest("./tmp"))
   .pipe(gulp.dest("./dist"))
 });
@@ -69,12 +69,12 @@ function isFixed(file) {
 }
 
 gulp.task('lint-fix', () =>{
-  return gulp.src(['app/js/**/*.js','app/sw.js','!node_modules/**'])
+  return gulp.src(['app/sw.js','!node_modules/**'])
   .pipe($.eslint({
     fix: true,
   }))
   .pipe($.eslint.format())
-  .pipe(gulpIf(isFixed, gulp.dest('./')))
+  .pipe(gulpIf(isFixed, gulp.dest('dist')))
   .pipe($.eslint.failAfterError())
 });
 
