@@ -38,11 +38,9 @@ url: https://developers.google.com/web/ilt/pwa/lab-caching-files-with-service-wo
 date: 08/04/18
 */
 self.addEventListener('fetch', function(event) {
-    const urlCheck = event.request.url;
+    const urlCheck = new URL(event.request.url);
     if (urlCheck.port == 1337) {
         //go to db and pull resource if there
-        let urlArr = urlCheck.split('/');
-        let dataPos = urlArr[urlArr.length - 1];
         handleDatabase(event);
           //else fetch from network look at idb lessons
     } else {

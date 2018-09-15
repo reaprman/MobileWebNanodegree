@@ -38,7 +38,9 @@ const reload = browserSync.reload;
 const browserify = require('browserify');
 const babelify = require('babelify');
 const source = require('vinyl-source-stream');
-const runSequence = require('run-sequence').use(gulp);
+const runSequence = require('run-sequence');
+const babel = require('gulp-babel');
+const gulpIf = require('gulp-if');
 
 // changes for sw idb import
 gulp.task('sw', () => {
@@ -47,19 +49,34 @@ gulp.task('sw', () => {
   });
   return b
   .transform(babelify)
-  .require("app/sw.js", {entry:true})
+  .require("sw.js", {entry:true})
   .bundle()
   .pipe(source("sw.js"))
-  .pipe(gulp.dest(".tmp/"))
+  .pipe(gulp.dest("./tmp"))
+  .pipe(gulp.dest("./dist"))
 });
 
 // Lint JavaScript
 gulp.task('lint', () =>
-  gulp.src(['app/js/**/*.js','app/sw.js','!node_modules/**'])
+   gulp.src(['app/js/**/*.js','app/sw.js','!node_modules/**'])
     .pipe($.eslint())
     .pipe($.eslint.format())
     .pipe($.if(!browserSync.active, $.eslint.failAfterError()))
 );
+
+function isFixed(file) {
+  return file.eslint !== null && file.eslint.fixed;
+}
+
+gulp.task('lint-fix', () =>{
+  return gulp.src(['app/js/**/*.js','app/sw.js','!node_modules/**'])
+  .pipe($.eslint({
+    fix: true,
+  }))
+  .pipe($.eslint.format())
+  .pipe(gulpIf(isFixed, gulp.dest('./')))
+  .pipe($.eslint.failAfterError())
+});
 
 // Optimize images
  gulp.task('images', () =>
@@ -206,7 +223,7 @@ gulp.task('serve:dist', ['default'], () =>
 gulp.task('default', ['clean'], cb =>
   runSequence(
     'styles',
-    ['sw', 'lint', 'html', 'scripts', 'images', 'copy'],
+    ['sw', 'lint', 'lint-fix', 'html', 'scripts', 'images', 'copy'],
     //'generate-service-worker',
     //cb
   )
