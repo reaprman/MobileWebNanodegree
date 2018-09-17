@@ -2,9 +2,11 @@
   "devDependencies": {
     "@babel/core": "^7.0.1",
     "@babel/helper-module-imports": "^7.0.0",
+    "@babel/plugin-transform-block-scoping": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/register": "^7.0.0",
     "apache-server-configs": "^2.14.0",
+    "babel-preset-env": "^1.7.0",
     "babelify": "^10.0.0",
     "browser-sync": "^2.24.7",
     "browserify": "^16.2.2",

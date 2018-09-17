@@ -28,19 +28,22 @@ class DBHelper {
         callback(error, null);
       }
     };
-    xhr.send(); */
-    let fetchURL;
+    xhr.send(); 
+    */
+    let fetchURL = DBHelper.DATABASE_URL;
+
     if (!id) {
       fetchURL = DBHelper.DATABASE_URL;
     } else {
       fetchURL = DBHelper.DATABASE_URL + '/' + id;
     }
-    fetch(fetchURL, {method: 'GET'}).then(response => response.json())
+
+    fetch(fetchURL).then(response => response.json())
     .then(data => {
-      console.log("restaurants JSON: ", data) // added from Project supplied webinar to troubleshoot 10th image not displaying
-      return callback(null, data)})
+      console.log("restaurants JSON: ", data); // added from Project supplied webinar to troubleshoot 10th image not displaying
+      callback(null, data)})
     .catch(err => {const error = (`Request failed. Returned ${err}`);
-    return callback(error, null);
+    callback(error, null);
   })
 
   }
@@ -52,6 +55,7 @@ class DBHelper {
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
+        console.log(typeof callback);
         callback(error, null);
       } else {
         const restaurant = restaurants.find(r => r.id == id);
@@ -103,6 +107,7 @@ class DBHelper {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
+        console.log(typeof callback);
         callback(error, null);
       } else {
         let results = restaurants

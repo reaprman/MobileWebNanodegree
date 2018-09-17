@@ -52,7 +52,7 @@ gulp.task('sw', () => {
   .require('app/sw.js', {entry:true})
   .bundle()
   .pipe(source('sw.js'))
-  .pipe(gulp.dest("./tmp"))
+  .pipe(gulp.dest(".tmp"))
   .pipe(gulp.dest("./dist"))
 });
 
@@ -145,7 +145,7 @@ gulp.task('scripts', () =>
       .pipe($.babel())
       .pipe($.sourcemaps.write())
       .pipe(gulp.dest('.tmp/js'))
-      .pipe($.uglify({preserveComments: 'some'}))
+      //.pipe($.uglify({preserveComments: 'some'}))
       // Output files
       .pipe($.size({title: 'js'}))
       .pipe($.sourcemaps.write('.'))
@@ -223,7 +223,8 @@ gulp.task('serve:dist', ['default'], () =>
 gulp.task('default', ['clean'], cb =>
   runSequence(
     'styles',
-    ['sw', 'lint', 'lint-fix', 'html', 'scripts', 'images', 'copy'],
+    ['sw', 'lint', 'html', 'scripts', 'images', 'copy'],
+    //'lint-fix',
     //'generate-service-worker',
     //cb
   )

@@ -30,10 +30,10 @@ date: 08/04/18
 */
 self.addEventListener('fetch', function (event) {
     var urlCheck = new URL(event.request.url);
-    console.log(urlCheck.port);
+    // console.log(urlCheck.port);
     if (urlCheck.port === '1337') {
       //go to db and pull resource if there
-      console.log('passed urlCheck');
+      // console.log('passed urlCheck');
       handleDatabase(event);
       //else fetch from network look at idb lessons
     } else {
@@ -53,7 +53,7 @@ const handleDatabase = (event) => {
           var tx = db.transaction(storeName);
           console.log(`Transaction store on handleDatabase: ${tx.objectStoreNames}`);
           var restStore = tx.objectStore(storeName);
-          console.log(`Store name pulled form db: ${restStore}`);
+          console.log(`Store name pulled form db: ${restStore.name}`);
           return restStore.getAll();
         }).then(restaurants => {
           if (!restaurants.length > 0) {
@@ -61,7 +61,7 @@ const handleDatabase = (event) => {
               return fetch(event.request).then(response => {
                     //database
                   return response.json().then(restaurants => {
-                    console.log(`JSON info from DB: ${restaurants}`);
+                    console.log(`JSON info from DB: ${Object.value(restaurants)}`);
                     restaurants.forEach(
                       restaurant => db.transaction(storeName, 'readwrite')
                       .objectStore(storeName)
