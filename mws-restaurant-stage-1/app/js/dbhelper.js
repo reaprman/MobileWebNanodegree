@@ -35,7 +35,7 @@ class DBHelper {
     } else {
       fetchURL = DBHelper.DATABASE_URL + '/' + id;
     }
-    fetch(fetchURL).then(response => response.json())
+    fetch(fetchURL, {method: 'GET'}).then(response => response.json())
     .then(data => {
       console.log("restaurants JSON: ", data) // added from Project supplied webinar to troubleshoot 10th image not displaying
       return callback(null, data)})
@@ -48,7 +48,7 @@ class DBHelper {
   /**
    * Fetch a restaurant by its ID.
    */
-  static fetchRestaurantById(id, callback) {
+  static fetchRestaurantById(callback, id) {
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
@@ -67,7 +67,7 @@ class DBHelper {
   /**
    * Fetch restaurants by a cuisine type with proper error handling.
    */
-  static fetchRestaurantByCuisine(cuisine, callback) {
+  static fetchRestaurantByCuisine(callback, cuisine) {
     // Fetch all restaurants  with proper error handling
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
@@ -83,7 +83,7 @@ class DBHelper {
   /**
    * Fetch restaurants by a neighborhood with proper error handling.
    */
-  static fetchRestaurantByNeighborhood(neighborhood, callback) {
+  static fetchRestaurantByNeighborhood(callback, neighborhood) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
@@ -99,7 +99,7 @@ class DBHelper {
   /**
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */
-  static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
+  static fetchRestaurantByCuisineAndNeighborhood(callback, cuisine, neighborhood) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
@@ -165,6 +165,7 @@ class DBHelper {
    * Change needed for Rest Server as extension is no longer supplied
    */
   static imageUrlForRestaurant(restaurant) {
+    //change due to database not having photograph value for every entry
     return (`/img/${restaurant.id}.jpg`);
   }
 

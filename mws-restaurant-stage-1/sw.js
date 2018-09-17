@@ -48,23 +48,26 @@ self.addEventListener('fetch', function (event) {
   
 
 const handleDatabase = (event) => {
-
   event.respondWith(
         dbPromise.then(db => {
-          var tx = db.transation(storeName);
+          var tx = db.transaction(storeName);
+          console.log(`Transaction store on handleDatabase: ${tx.objectStoreNames}`);
           var restStore = tx.objectStore(storeName);
+          console.log(`Store name pulled form db: ${restStore}`);
           return restStore.getAll();
         }).then(restaurants => {
-          if (!restaurants) {
+          if (!restaurants.length > 0) {
                 //go get data
               return fetch(event.request).then(response => {
                     //database
-                  restaurants = response.json();
-                  restaurants.forEach(
-                        restaurant => db.transaction(storeName, 'readwrite')
-                        .objectStore(storeName)
-                        .put(restaurant)
-                    );
+                  return response.json().then(restaurants => {
+                    console.log(`JSON info from DB: ${restaurants}`);
+                    restaurants.forEach(
+                      restaurant => db.transaction(storeName, 'readwrite')
+                      .objectStore(storeName)
+                      .put(restaurant)
+                  );
+                  })
                 })
             }
           return restaurants;
