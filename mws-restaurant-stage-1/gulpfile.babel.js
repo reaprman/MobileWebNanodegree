@@ -145,7 +145,7 @@ gulp.task('scripts', () =>
       .pipe($.babel())
       .pipe($.sourcemaps.write())
       .pipe(gulp.dest('.tmp/js'))
-      //.pipe($.uglify({preserveComments: 'some'}))
+      .pipe($.uglify({preserveComments: 'some'}))
       // Output files
       .pipe($.size({title: 'js'}))
       .pipe($.sourcemaps.write('.'))

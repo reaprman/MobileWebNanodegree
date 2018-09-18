@@ -5,7 +5,7 @@ const storeName = 'restaurants';
 const dbPromise = idb.open(database, 1, function(upgradeDb) {
   switch (upgradeDb.oldVersion) {
       case 0:
-        upgradeDb.createObjectStore(storeName, {keyPath: "id"});
+        upgradeDb.createObjectStore(storeName, { keyPath: 'id' });
     }
 });
 
@@ -22,6 +22,7 @@ self.addEventListener('install', function(event) {
          })
      );
  });
+ 
 
 /*
 To debug fetch code
@@ -51,7 +52,6 @@ const handleDatabase = (event) => {
   event.respondWith(
         dbPromise.then(db => {
           var tx = db.transaction(storeName);
-          console.log(`Transaction store on handleDatabase: ${tx.objectStoreNames}`);
           var restStore = tx.objectStore(storeName);
           console.log(`Store name pulled form db: ${restStore.name}`);
           return restStore.getAll();

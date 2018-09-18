@@ -36,17 +36,18 @@ class DBHelper {
       fetchURL = DBHelper.DATABASE_URL;
     } else {
       fetchURL = DBHelper.DATABASE_URL + '/' + id;
-    }
+    } 
 
-    fetch(fetchURL).then(response => response.json())
+    fetch(fetchURL, { method: 'GET' }).then(response => {response.json()
     .then(data => {
       console.log("restaurants JSON: ", data); // added from Project supplied webinar to troubleshoot 10th image not displaying
-      callback(null, data)})
+      callback(null, data);
+      });
+    })
     .catch(err => {const error = (`Request failed. Returned ${err}`);
     callback(error, null);
   })
-
-  }
+}
 
   /**
    * Fetch a restaurant by its ID.
