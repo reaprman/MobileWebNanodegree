@@ -15,7 +15,7 @@ self.addEventListener('install', function(event) {
    event.waitUntil(
          caches.open(appCache).then(function(cache) {
            return cache.addAll([
-              './'
+              '/'
             ]);
          }).catch(function(err) {
            console.log('Cache failed to load: ', err);

@@ -38,11 +38,11 @@ class DBHelper {
       fetchURL = DBHelper.DATABASE_URL + '/' + id;
     } 
     console.log(`FetchURL is: ${fetchURL}`);
-    
-    fetch(fetchURL, { method: 'GET' }).then(response => {response.json()
-    .then(data => {
-      console.log("restaurants JSON: ", data); // added from Project supplied webinar to troubleshoot 10th image not displaying
-      callback(null, data);
+
+    fetch(fetchURL, { method: 'GET' }).then(response => {
+      response.json().then(restaurants => {
+      console.log("restaurants JSON: ", restaurants); // added from Project supplied webinar to troubleshoot 10th image not displaying
+      callback(null, restaurants);
       });
     })
     .catch(err => {const error = (`Request failed. Returned ${err}`);
@@ -109,7 +109,7 @@ class DBHelper {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
-        console.log(typeof callback);
+        //console.log(typeof callback);
         callback(error, null);
       } else {
         let results = restaurants
