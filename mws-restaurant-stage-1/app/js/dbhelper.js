@@ -55,7 +55,7 @@ class DBHelper {
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
-        console.log(typeof callback);
+        console.log(`callback type: ${typeof callback}`);
         callback(error, null);
       } else {
         const restaurant = restaurants.find(r => r.id == id);
@@ -103,7 +103,7 @@ class DBHelper {
   /**
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */
-  static fetchRestaurantByCuisineAndNeighborhood(callback, cuisine, neighborhood) {
+  static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
