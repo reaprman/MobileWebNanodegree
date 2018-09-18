@@ -52,6 +52,7 @@ const handleDatabase = (event) => {
   event.respondWith(
         dbPromise.then(db => {
           var tx = db.transaction(storeName);
+          //console.log(`Transaction store on handleDatabase: ${JSON.stringify(tx.objectStoreNames)}`);
           var restStore = tx.objectStore(storeName);
           console.log(`Store name pulled form db: ${restStore.name}`);
           return restStore.getAll();

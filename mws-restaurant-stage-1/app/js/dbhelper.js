@@ -37,7 +37,8 @@ class DBHelper {
     } else {
       fetchURL = DBHelper.DATABASE_URL + '/' + id;
     } 
-
+    console.log(`FetchURL is: ${fetchURL}`);
+    
     fetch(fetchURL, { method: 'GET' }).then(response => {response.json()
     .then(data => {
       console.log("restaurants JSON: ", data); // added from Project supplied webinar to troubleshoot 10th image not displaying
