@@ -65,27 +65,29 @@ const handleDatabase = (event) => {
                 //go get data
               return fetch(event.request).then(response => {
                 //database
-                return response.json().then(restaurants => {
-                  dbPromise.then(db => {
-                  console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
+                response.json().then(restaurants => {
+                  return dbPromise.then(db => {
+                  //console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
                   var tx = db.transaction(storeName, 'readwrite');
                   var restStore = tx.objectStore(storeName);
                   console.log(`Transaction store submit to Database: ${JSON.stringify(tx.objectStoreNames)}`);
                   restaurants.forEach( restaurant => 
                     restStore.put(restaurant)
                     );
+                  return restaurants;
                   })
-                })
-              })
+                });
+              });
+            } else {
+              return restaurants;
             }
-          return restaurants;
+          
         })
         .then(finalResponse => {
           return new Response(JSON.stringify(finalResponse));
         })
         .catch(error => {
-          return new Response('Error fetching data', {status: 500});
+          return new Response('Error fetching data', error + " ", {status: 500});
         })
     );
-    
 }
