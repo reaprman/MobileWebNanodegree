@@ -2,20 +2,26 @@ import idb from 'idb';
 const database = 'restaurant-db';
 const storeName = 'restaurants';
 
-const dbPromise = idb.open(database, 1, function(upgradeDb) {
+const dbPromise = idb.open(database, 1, upgradeDb => {
   switch (upgradeDb.oldVersion) {
       case 0:
         upgradeDb.createObjectStore(storeName, { keyPath: 'id' });
     }
 });
 
-var appCache = 'restaurant-cache';
+let appCache = 'restaurant-cache';
 
 self.addEventListener('install', function(event) {
    event.waitUntil(
          caches.open(appCache).then(function(cache) {
            return cache.addAll([
-              '/'
+              '/',
+              '/index.html',
+              '/restaurant.html',
+              '/css/styles.css',
+              '/js/',
+              'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
+              'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js'
             ]);
          }).catch(function(err) {
            console.log('Cache failed to load: ', err);
@@ -34,7 +40,7 @@ self.addEventListener('fetch', function (event) {
     // console.log(urlCheck.port);
     if (urlCheck.port === '1337') {
       //go to db and pull resource if there
-      // console.log('passed urlCheck');
+      //console.log('passed urlCheck');
       handleDatabase(event);
       //else fetch from network look at idb lessons
     } else {
@@ -43,7 +49,6 @@ self.addEventListener('fetch', function (event) {
       caches.match(event.request).then(function (response) {
         return response || fetch(event.request);
       }));
-  
     }
   });
   
@@ -52,7 +57,6 @@ const handleDatabase = (event) => {
   event.respondWith(
         dbPromise.then(db => {
           var tx = db.transaction(storeName);
-          //console.log(`Transaction store on handleDatabase: ${JSON.stringify(tx.objectStoreNames)}`);
           var restStore = tx.objectStore(storeName);
           console.log(`Store name pulled form db: ${restStore.name}`);
           return restStore.getAll();
@@ -60,16 +64,19 @@ const handleDatabase = (event) => {
           if (!restaurants.length > 0) {
                 //go get data
               return fetch(event.request).then(response => {
-                    //database
-                  return response.json().then(restaurants => {
-                    console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
-                    restaurants.forEach(
-                      restaurant => db.transaction(storeName, 'readwrite')
-                      .objectStore(storeName)
-                      .put(restaurant)
-                  );
+                //database
+                return response.json().then(restaurants => {
+                  dbPromise.then(db => {
+                  console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
+                  var tx = db.transaction(storeName, 'readwrite');
+                  var restStore = tx.objectStore(storeName);
+                  console.log(`Transaction store submit to Database: ${JSON.stringify(tx.objectStoreNames)}`);
+                  restaurants.forEach( restaurant => 
+                    restStore.put(restaurant)
+                    );
                   })
                 })
+              })
             }
           return restaurants;
         })
@@ -82,4 +89,3 @@ const handleDatabase = (event) => {
     );
     
 }
- 

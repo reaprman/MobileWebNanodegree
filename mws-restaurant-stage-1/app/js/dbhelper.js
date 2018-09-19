@@ -39,7 +39,7 @@ class DBHelper {
     } 
     console.log(`FetchURL is: ${fetchURL}`);
 
-    fetch(fetchURL, { method: 'GET' }).then(response => {
+    fetch(fetchURL).then(response => {
       response.json().then(restaurants => {
       console.log("restaurants JSON: ", restaurants); // added from Project supplied webinar to troubleshoot 10th image not displaying
       callback(null, restaurants);
@@ -53,7 +53,7 @@ class DBHelper {
   /**
    * Fetch a restaurant by its ID.
    */
-  static fetchRestaurantById(callback, id) {
+  static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
