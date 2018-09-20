@@ -45,7 +45,7 @@ self.addEventListener('fetch', function (event) {
       //else fetch from network look at idb lessons
     } else {
       //only cache if necessary changes needed...
-      event.respondWith(
+      event.respondWith( 
       caches.match(event.request).then(function (response) {
         return response || fetch(event.request);
       }));
@@ -55,39 +55,28 @@ self.addEventListener('fetch', function (event) {
 
 const handleDatabase = (event) => {
   event.respondWith(
-        dbPromise.then(db => {
-          var tx = db.transaction(storeName);
-          var restStore = tx.objectStore(storeName);
-          console.log(`Store name pulled form db: ${restStore.name}`);
-          return restStore.getAll();
-        }).then(restaurants => {
-          if (!restaurants.length > 0) {
-                //go get data
-              return fetch(event.request).then(response => {
-                //database
-                response.json().then(restaurants => {
-                  return dbPromise.then(db => {
-                  //console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
-                  var tx = db.transaction(storeName, 'readwrite');
-                  var restStore = tx.objectStore(storeName);
-                  console.log(`Transaction store submit to Database: ${JSON.stringify(tx.objectStoreNames)}`);
-                  restaurants.forEach( restaurant => 
-                    restStore.put(restaurant)
-                    );
-                  return restaurants;
-                  })
-                });
-              });
-            } else {
-              return restaurants;
-            }
-          
-        })
-        .then(finalResponse => {
-          return new Response(JSON.stringify(finalResponse));
-        })
-        .catch(error => {
-          return new Response('Error fetching data', error + " ", {status: 500});
-        })
-    );
+    dbPromise.then(db => {return db.transaction(storeName)
+      .objectStore(storeName).getAll();
+    }).then(restaurants => {
+      if (!restaurants.length > 0 ) {
+        return fetch(event.request).then(response => {
+          return response.json().then(restaurants => {
+            return dbPromise.then(db => {
+              var tx = db.transaction(storeName,'readwrite');
+              var restStore = tx.objectStore(storeName);
+              restaurants.forEach(restaurant =>
+                restStore.put(restaurant));
+            });
+          })
+        });
+      }
+      return restaurants
+    })
+    .then(finalResponse => {
+      return new Response(JSON.stringify(finalResponse));
+    })
+    .catch(error => {
+      return new Response(`Error fetching data ${error} ${{status: 500}}`);
+    })
+  );
 }
