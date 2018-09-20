@@ -69,8 +69,9 @@ const handleDatabase = (event) => {
             });
           })
         });
+      } else {
+        return restaurants; 
       }
-      return restaurants
     })
     .then(finalResponse => {
       return new Response(JSON.stringify(finalResponse));

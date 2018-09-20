@@ -19,7 +19,10 @@ self.addEventListener('install', function(event) {
               '/index.html',
               '/restaurant.html',
               '/css/styles.css',
-              '/js/',
+              '/js/dbhelper.js',
+              '/js/main.js',
+              '/js/restaurant_info.js',
+              '/js/sw_register.js',
               'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
               'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js'
             ]);
@@ -64,13 +67,15 @@ const handleDatabase = (event) => {
             return dbPromise.then(db => {
               var tx = db.transaction(storeName,'readwrite');
               var restStore = tx.objectStore(storeName);
+              console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
               restaurants.forEach(restaurant =>
                 restStore.put(restaurant));
             });
           })
         });
+      } else {
+        return restaurants; 
       }
-      return restaurants
     })
     .then(finalResponse => {
       return new Response(JSON.stringify(finalResponse));
