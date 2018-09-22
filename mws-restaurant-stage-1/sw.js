@@ -19,7 +19,10 @@ self.addEventListener('install', function(event) {
               '/index.html',
               '/restaurant.html',
               '/css/styles.css',
-              '/js/',
+              '/js/dbhelper.js',
+              '/js/main.js',
+              '/js/restaurant_info.js',
+              '/js/sw_register.js',
               'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
               'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js'
             ]);
@@ -55,7 +58,8 @@ self.addEventListener('fetch', function (event) {
 
 const handleDatabase = (event) => {
   event.respondWith(
-    dbPromise.then(db => {return db.transaction(storeName)
+    dbPromise.then(db => {
+      return db.transaction(storeName)
       .objectStore(storeName).getAll();
     }).then(restaurants => {
       if (!restaurants.length > 0 ) {
@@ -64,19 +68,20 @@ const handleDatabase = (event) => {
             return dbPromise.then(db => {
               var tx = db.transaction(storeName,'readwrite');
               var restStore = tx.objectStore(storeName);
-              restaurants.forEach(restaurant =>
-                restStore.put(restaurant));
+              console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
+              return restaurants.forEach(restaurant =>{ 
+                restStore.put(restaurant)
+              })
             });
           })
         });
       } else {
+        console.log(`DATA from DB: ${restaurants}`);
         return restaurants; 
       }
-    })
-    .then(finalResponse => {
+    }).then(finalResponse => {
       return new Response(JSON.stringify(finalResponse));
-    })
-    .catch(error => {
+    }).catch(error => {
       return new Response(`Error fetching data ${error} ${{status: 500}}`);
     })
   );

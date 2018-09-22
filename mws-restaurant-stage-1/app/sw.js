@@ -58,7 +58,8 @@ self.addEventListener('fetch', function (event) {
 
 const handleDatabase = (event) => {
   event.respondWith(
-    dbPromise.then(db => {return db.transaction(storeName)
+    dbPromise.then(db => {
+      return db.transaction(storeName)
       .objectStore(storeName).getAll();
     }).then(restaurants => {
       if (!restaurants.length > 0 ) {
@@ -68,19 +69,19 @@ const handleDatabase = (event) => {
               var tx = db.transaction(storeName,'readwrite');
               var restStore = tx.objectStore(storeName);
               console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
-              restaurants.forEach(restaurant =>
-                restStore.put(restaurant));
+              return restaurants.forEach(restaurant =>{ 
+                restStore.put(restaurant)
+              })
             });
           })
         });
       } else {
+        console.log(`DATA from DB: ${restaurants}`);
         return restaurants; 
       }
-    })
-    .then(finalResponse => {
+    }).then(finalResponse => {
       return new Response(JSON.stringify(finalResponse));
-    })
-    .catch(error => {
+    }).catch(error => {
       return new Response(`Error fetching data ${error} ${{status: 500}}`);
     })
   );

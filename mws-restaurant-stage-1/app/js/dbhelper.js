@@ -39,12 +39,12 @@ class DBHelper {
     }
 
       fetch(fetchURL).then(response => {
-      response.json().then(restaurants => {
+      response.clone().json().then(restaurants => {
       console.log("restaurants JSON: ", restaurants); // added from Project supplied webinar to troubleshoot 10th image not displaying
       callback(null, restaurants);
       });
-    })
-    .catch(err => {const error = (`Request failed. Returned ${err}`);
+    }).catch(err => {
+    const error = (`Request failed. Returned ${err}`);
     callback(error, null);
   });
 }
