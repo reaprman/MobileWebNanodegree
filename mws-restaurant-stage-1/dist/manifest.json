@@ -1,0 +1,8 @@
+{
+    "short_name": "RestaurantReviewApp",
+    "name": "Udacity Restaurant Review Project MWS GWG Scholar",
+    "start_url": "index.html",
+    "background_color": "#0c334e",
+    "theme_color": "#0c334e",
+    "display": "fullscreen"
+}

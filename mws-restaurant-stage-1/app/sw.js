@@ -18,6 +18,7 @@ self.addEventListener('install', function(event) {
               '/',
               '/index.html',
               '/restaurant.html',
+              '/manifest.json',
               '/css/styles.css',
               '/js/dbhelper.js',
               '/js/main.js',
@@ -50,41 +51,45 @@ self.addEventListener('fetch', function (event) {
       //only cache if necessary changes needed...
       event.respondWith( 
       caches.match(event.request).then(function (response) {
-        return response || fetch(event.request);
+        return response || fetch(event.request).then(response => {
+          return caches.open(appCache).then(cache => {
+            cache.put(event.request, response.clone());
+            return response;
+          })
+        })
       }));
     }
   });
   
 
-const handleDatabase = (event) => {
-  event.respondWith(
-    dbPromise.then(db => {
-      return db.transaction(storeName)
-      .objectStore(storeName).getAll();
-    }).then(restaurants => {
-      if (!restaurants.length > 0 ) {
-        return fetch(event.request).then(response => {
-          return response;
-        }).then(restaurants => {
-            return dbPromise.then(db => {
-              var tx = db.transaction(storeName,'readwrite');
-              var restStore = tx.objectStore(storeName);
-              console.log(`JSON info for DB: ${restaurants}`);
-              return restaurants.forEach(restaurant =>{ 
-                restStore.put(restaurant)
-              })
-            });
-          })
-      } else {
-        console.log(`DATA from DB: ${restaurants}`);
-        return restaurants; 
-      }
-    }).then(finalResponse => {
-      console.trace();
-      return new Response(JSON.stringify(finalResponse));
-      
-    }).catch(error => {
-      return new Response(`Error fetching data ${error} ${{status: 500}}`);
-    })
-  );
-}
+  const handleDatabase = (event) => {
+    event.respondWith(
+      dbPromise.then(db => {
+        return db.transaction(storeName)
+        .objectStore(storeName).getAll();
+      }).then(restaurants => {
+        if (!restaurants.length > 0) {
+          return fetch(event.request).then(response => {
+            return response.json();
+          }).then(restaurants => {
+              return dbPromise.then(db => {
+                var tx = db.transaction(storeName,'readwrite');
+                var restStore = tx.objectStore(storeName);
+                //console.log(`JSON info for DB: ${restaurants}`);
+                restaurants.forEach(restaurant =>{ 
+                  restStore.put(restaurant);
+                });
+                return restaurants
+              });
+            })
+        } else {
+          //console.log(`DATA from DB: ${restaurants}`);
+          return restaurants; 
+        }
+      }).then(finalResponse => {
+        return new Response(JSON.stringify(finalResponse));
+      }).catch(error => {
+        return new Response(`Error fetching data ${error} ${{status: 500}}`);
+      })
+    );
+  }
