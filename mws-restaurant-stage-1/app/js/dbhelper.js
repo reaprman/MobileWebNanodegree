@@ -39,7 +39,7 @@ class DBHelper {
     }
 
       fetch(fetchURL).then(response => {
-      response.clone().json().then(restaurants => {
+      response.json().then(restaurants => {
       console.log("restaurants JSON: ", restaurants); // added from Project supplied webinar to troubleshoot 10th image not displaying
       callback(null, restaurants);
       });

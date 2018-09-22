@@ -64,23 +64,25 @@ const handleDatabase = (event) => {
     }).then(restaurants => {
       if (!restaurants.length > 0 ) {
         return fetch(event.request).then(response => {
-          return response.json().then(restaurants => {
+          return response;
+        }).then(restaurants => {
             return dbPromise.then(db => {
               var tx = db.transaction(storeName,'readwrite');
               var restStore = tx.objectStore(storeName);
-              console.log(`JSON info for DB: ${JSON.stringify(restaurants)}`);
+              console.log(`JSON info for DB: ${restaurants}`);
               return restaurants.forEach(restaurant =>{ 
                 restStore.put(restaurant)
               })
             });
           })
-        });
       } else {
         console.log(`DATA from DB: ${restaurants}`);
         return restaurants; 
       }
     }).then(finalResponse => {
+      console.trace();
       return new Response(JSON.stringify(finalResponse));
+      
     }).catch(error => {
       return new Response(`Error fetching data ${error} ${{status: 500}}`);
     })
