@@ -1,11 +1,2 @@
-"use strict";if (navigator.serviceWorker) {
-
-  navigator.serviceWorker.register('/sw.js').then(function () {
-    console.log('Service Worker: Registered');
-  }).catch(function (err) {
-    console.log('Service Worker: Registration Failure ' + err);
-  });
-}
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInN3X3JlZ2lzdGVyLmpzIl0sIm5hbWVzIjpbIm5hdmlnYXRvciIsInNlcnZpY2VXb3JrZXIiLCJyZWdpc3RlciIsInRoZW4iLCJjb25zb2xlIiwibG9nIiwiY2F0Y2giLCJlcnIiXSwibWFwcGluZ3MiOiJhQUFBLElBQUdBLFNBQVMsQ0FBQ0MsYUFBYixFQUE0Qjs7QUFFeEJELEVBQUFBLFNBQVMsQ0FBQ0MsYUFBVixDQUF3QkMsUUFBeEIsQ0FBaUMsUUFBakMsRUFBMkNDLElBQTNDLENBQWdELFlBQVc7QUFDdkRDLElBQUFBLE9BQU8sQ0FBQ0MsR0FBUixDQUFZLDRCQUFaO0FBQ0gsR0FGRCxFQUVHQyxLQUZILENBRVMsVUFBU0MsR0FBVCxFQUFhO0FBQ2xCSCxJQUFBQSxPQUFPLENBQUNDLEdBQVIsQ0FBWSwwQ0FBMENFLEdBQXREO0FBQ0gsR0FKRDtBQUtIIiwic291cmNlc0NvbnRlbnQiOlsiaWYobmF2aWdhdG9yLnNlcnZpY2VXb3JrZXIpIHtcclxuXHJcbiAgICBuYXZpZ2F0b3Iuc2VydmljZVdvcmtlci5yZWdpc3RlcignL3N3LmpzJykudGhlbihmdW5jdGlvbigpIHtcclxuICAgICAgICBjb25zb2xlLmxvZygnU2VydmljZSBXb3JrZXI6IFJlZ2lzdGVyZWQnKVxyXG4gICAgfSkuY2F0Y2goZnVuY3Rpb24oZXJyKXtcclxuICAgICAgICBjb25zb2xlLmxvZygnU2VydmljZSBXb3JrZXI6IFJlZ2lzdHJhdGlvbiBGYWlsdXJlICcgKyBlcnIpO1xyXG4gICAgfSk7XHJcbn0iXSwiZmlsZSI6InN3X3JlZ2lzdGVyLmpzIn0=
-
+"use strict";navigator.serviceWorker&&navigator.serviceWorker.register("/sw.js").then(function(){console.log("Service Worker: Registered")})["catch"](function(e){console.log("Service Worker: Registration Failure "+e)});
 //# sourceMappingURL=sw_register.js.map
