@@ -107,6 +107,58 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   }
   // fill reviews
   fillReviewsHTML();
+
+  // create review modal
+  fillReviewModal();
+}
+
+/**
+ * Create Modal to submit new review
+ */
+const fillReviewModal = () => {
+  const modal = document.createElement(`div`);
+  modal.className='modal';
+  modal.id='modal';
+
+  const content = document.createElement('div');
+  content.className='modal-content';
+  const close = document.createElement('span');
+  close.className='close-btn';
+  close.innerHTML='&times;'
+  content.appendChild(close);
+
+  const name = document.createElement('input');
+  name.className = 'rvw-reviewer';
+  name.setAttribute('type','text');
+  name.setAttribute('value', 'Your Name');
+  content.appendChild(name);
+
+  const rating = document.createElement('select');
+  let option = document.createElement('option');
+  //loop through and create ratings
+  const rates = [1,2,3,4,5];
+  rates.forEach(rate =>{
+    option.value = rate;
+    rating.appendChild(option);
+  });
+  content.appendChild(rating);
+
+  const review = document.createElement('textarea');
+  review.className = 'rvw-comment';
+  content.appendChild(review);
+
+  //add submit button
+  const submit = document.createElement('input');
+  submit.className = 'submit-btn';
+  submit.setAttribute('type','submit');
+  submit.innerHTML = 'Save Review';
+  //submit.addEventListener('click',);
+  content.appendChild(submit);
+  //add content to modal
+  modal.appendChild(content);
+  //add modal to restaurant review page
+  const container =  document.getElementById('reviews-container');
+  container.appendChild(modal);
 }
 
 /**
@@ -132,10 +184,23 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+const fillReviewsHTML = (error, reviews) => {
+  if(error) {
+    console.log(`Error displaying reviews: ${error}`);
+  }
+  self.restaurant.reviews = reviews;
+
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
+  
+  const addReviewLink = document.createElement("a");
+  addReviewLink.innerHTML = 'Add Review';
+  addReviewLink.onclick =  function(){
+    let modal = getElementbyId('modal');
+    modal.classList.toggle('show-modal');
+  }
+  title.appendChild(addReviewLink);
   container.appendChild(title);
 
   if (!reviews) {

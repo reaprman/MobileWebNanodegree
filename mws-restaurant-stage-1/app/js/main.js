@@ -174,6 +174,17 @@ const createRestaurantHTML = (restaurant) => {
   name.innerHTML = restaurant.name;
   li.append(name);
 
+  const favoriteIcon = document.createElement('div');
+  const isFavorite = (restaurant["is_favorite"] && restaurant["is_favorite"].toString() === "true") ? true : false;
+  favoriteIcon.className = 'fav-icon';
+  const favorite = document.createElement('button');
+  favorite.style.background = isFavorite ? `url("/img/like.svg") no-repeat`
+    : `url("/img/not-like.svg") no-repeat`;
+  favorite.id = `fav-icon-${restaurant.id}`;
+  favorite.onclick = event => handleFavClick(restaurant.id, !isFavorite);
+  favoriteIcon.append(favorite);
+  li.append(favoriteIcon);
+
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
   li.append(neighborhood);
@@ -191,6 +202,21 @@ const createRestaurantHTML = (restaurant) => {
   li.append(more)
 
   return li
+}
+
+const handleFavClick = (id, favStatus) => {
+  const fav = document.getElementById(`fav-icon-${id}`);
+  console.log(`onclick info: ${self.restaurants[id]}`);
+  let restaurant = self.restaurants[id-1];
+  restaurant["is_favorite"] = favStatus;
+  if(!favStatus) {
+    fav.setAttribute('aria-label', `${restaurant.name} not favorite`);
+    fav.style.background = `url(/img/not-like.svg) no-repeat`;
+  } else {
+    fav.setAttribute('aria-label', `${restaurant.name} favorite`);
+    fav.style.background = `url(/img/like.svg) no-repeat`;
+  }
+  fav.onclick = event => handleFavClick(id, !favStatus);
 }
 
 /**
