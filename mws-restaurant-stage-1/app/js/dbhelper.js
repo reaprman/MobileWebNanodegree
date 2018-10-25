@@ -1,3 +1,19 @@
+/* 
+import idb from 'idb'
+const review_database = 'review-db';
+const dbReviews = idb.open(review_database, 1, upgradeDb => {
+  switch (upgradeDb.oldVersion) {
+    case 0:
+      let keyValStore = upgradeDb.createObjectStore('reviews', {keypath: ''});
+      keyValStore.createIndex('restaurant_id', 'restaurant_id');
+  }
+}); */
+
+let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+let type = connection.type;
+let networkStatus = true;
+
+
 /**
  * Common database helper functions.
  */
@@ -10,6 +26,11 @@ class DBHelper {
   static get DATABASE_URL() {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/restaurants`;
+  }
+
+  static get DATABASE_URL_REVIEWS() {
+    const port = 1337
+    return `http://localhost:${port}/reviews/`;
   }
   
   /**
@@ -199,5 +220,96 @@ class DBHelper {
     return marker;
   } */
 
+  /**
+   * 
+   */
+  static checkConnection(){
+    return (networkStatus === true) ?true :false;
+  }
+
+  /**
+   * 
+   */
+  static updateConnectionStatus() {
+    if((type == 'none') && (connection.type == ' none')){
+      console.log("Connection has been lost");
+      networkStatus = false;
+    } else {
+      console.log("Connection reestablished");
+      networkStatus = true;
+      //check for pending updates need more code under here
+    }
+    console.log("Connection type changed from " + type + " to " + connection.type);
+    type = connection.type;
+  }
+
+  /**
+   * Add new and Update old review
+   */
+  static addUpdateReviewIDB(review) {
+
+  }
+
+  /**
+   * Save Review 
+   */
+  static saveReview(id, name, rating, comment,callback) {
+    const reviewURL = DBHelper.DATABASE_URL_REVIEWS;
+    const review = {
+      restaurant_id: id,
+      name: name,
+      rating: rating,
+      comments: comment,
+      createdAt: Date.now()
+    }
+    //if connection submit to server else post in idb with flag set for offline
+    //DBHelper.checkConnection();
+    if(networkStatus === false){
+      //add flag for offline
+      const tempId = new Date().getTime();
+      review.id = tempId;
+      review.offlineFlag = true;
+      //add review to idb
+      //DBHelper.addUpdateReviewIDB(review);
+      
+    }
+    fetch(reviewURL, {
+      method: 'post',
+      body: JSON.stringify(review)
+    }).then(response => {
+      response.json().then(data => {
+        //call to function to add or update db
+        callback(null,data);
+      });
+    }).catch(err => {
+      const error = `Submission to server failed: ${err}`;
+      callback(error,null);
+    })
+  }
+  /**
+   * Fetch reviews by id for resource management
+   */
+  static fetchReviewByRestaurantId(id, callback){
+      const reviewURL = `${DBHelper.DATABASE_URL_REVIEWS}?restaurant_id=${id}`;
+      console.log(reviewURL);
+      fetch(reviewURL).then(response => {
+        response.json().then(reviews => {
+          if(!reviews){
+            callback(error,null);
+          }/* else{
+            //deal with reviews that are found...add to idb
+            reviews.forEach(review => {
+              DBHelper.addUpdateReviewIDB(review);
+            })
+          } */
+          callback(null, reviews);
+        });
+      }).catch(err => {
+        callback(`Review request failed: Returned ${err}`,null);
+        //need logic to fetch from idb on error and send data back with callback
+      });
+  }
 }
+//add event listener for connection change from mozilla.org
+//connection.addEventListener('change', DBHelper.updateConnectionStatus); 
 

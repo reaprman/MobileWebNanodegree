@@ -75,6 +75,7 @@ top: 0;
 /* ====================== Modal ====================== */
 .modal{
   position: fixed;
+  z-index: 1050;
   left: 0;
   top: 0;
   width: 100%;
@@ -90,29 +91,71 @@ top: 0;
   left: 50%;
   transform: translate(-50%, -50%);
 	background-color: #fdfdfd;
-  padding: 1rem 1.5rem;
   width: 80%;
+  max-width: 500px;
   border-radius: 0.5rem;
 }
 .close-btn{
   float: right;
+  color: lightgray;
+  font-size: 1.5rem;
+  font-weight: 700;
   width: 1.5rem;
   line-height: 1.5rem;
-  text-align: center;
-  cursor: pointer;
   border-radius: 0.25rem;
-  background-color: lightgray;
 }
 .close-btn:hover,
 .close-btn:focus {
-  background-color: darkgray;
   cursor: pointer;
+  color: #000;
 }
 .show-modal{
   opacity: 1;
   visibility: visible;
   transform: scale(1.0);
   transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+}
+.modal-header,
+.modal-form{
+  text-align: center;
+}
+.modal-form{
+  width: 100%;
+}
+.modal-header{
+  border-bottom: 2px solid lightgray;
+  background-color: #f58500
+}
+.modal-header h3{
+  color: #fff
+}
+.modal-body{
+  padding: 1rem;
+}
+.rvw-reviewer,
+.rvw-rate,
+.rvw-comment{
+  width: 80%;
+  border: none;
+  border-bottom: 1px solid rgb(172, 172, 172);
+  padding: 1rem;
+  
+}
+.modal-footer{
+  justify-content: center;
+  border-top: 1px solid lightgray;
+  padding: 1rem;
+}
+.submit-btn{
+  background-color: #f58500;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin: 5px;
+  padding: 12px 30px;
+  font-weight: bold;
+  border-radius: 5px;
 }
 
 /* ====================== Navigation ====================== */

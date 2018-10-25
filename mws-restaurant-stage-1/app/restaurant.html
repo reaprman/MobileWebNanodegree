@@ -56,6 +56,33 @@
     <!-- end restaurant -->
     <!-- Beginning reviews -->
     <section id="reviews-container">
+      <!-- Modal new review-->
+      <div class="modal" id="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="close-btn" aria-role="button" aria-hidden="true">&times;</span>
+            <h3 class="modal-title">Create new review</h3>
+          </div>
+          <form class="modal-form">
+            <div class="modal-body">
+              <div class="modal-reviewer">
+                <input type="text" class="rvw-reviewer" placeholder="Your name">
+              </div>
+              <div class="modal-rate">
+                <select class="rvw-rate" id="rvw-rate"></select>
+              </div>
+              <div class="modal-comment">
+                <textarea class="rvw-comment" placeholder="Your review"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="submit-btn">Save review</button>
+            </div>
+          </form>
+        </div>
+        
+
+      </div>
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->

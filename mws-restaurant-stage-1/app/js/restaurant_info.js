@@ -61,7 +61,7 @@ const fetchRestaurantFromURL = (callback) => {
   }
   const id = getParameterByName('id');
   if (!id) { // no id found in URL
-    error = 'No restaurant id in URL'
+    error = 'No restaurant id in URL';
     callback(error, null);
   } else {
     DBHelper.fetchRestaurantById(id, (error, restaurant) => {
@@ -106,59 +106,58 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
-
+  DBHelper.fetchReviewByRestaurantId(restaurant.id, (error, reviews) => {
+    fillReviewsHTML(error, reviews);
+  })
+  
   // create review modal
   fillReviewModal();
+  
 }
-
+/**
+ * Function to toggle display of modal window
+ */
+function modalToggle(){
+  const modal = document.getElementById('modal');
+    modal.classList.toggle('show-modal');
+}
 /**
  * Create Modal to submit new review
  */
 const fillReviewModal = () => {
-  const modal = document.createElement(`div`);
-  modal.className='modal';
-  modal.id='modal';
 
-  const content = document.createElement('div');
-  content.className='modal-content';
-  const close = document.createElement('span');
-  close.className='close-btn';
-  close.innerHTML='&times;'
-  content.appendChild(close);
-
-  const name = document.createElement('input');
-  name.className = 'rvw-reviewer';
-  name.setAttribute('type','text');
-  name.setAttribute('value', 'Your Name');
-  content.appendChild(name);
-
-  const rating = document.createElement('select');
-  let option = document.createElement('option');
+  const rating = document.getElementById('rvw-rate');
   //loop through and create ratings
   const rates = [1,2,3,4,5];
   rates.forEach(rate =>{
+    const option = document.createElement('option');
     option.value = rate;
-    rating.appendChild(option);
+    option.innerText = rate.toString();
+    rating.append(option);
   });
-  content.appendChild(rating);
 
-  const review = document.createElement('textarea');
-  review.className = 'rvw-comment';
-  content.appendChild(review);
+  const close = document.getElementsByClassName('close-btn')[0];
+  close.addEventListener("click", modalToggle);
 
-  //add submit button
-  const submit = document.createElement('input');
-  submit.className = 'submit-btn';
-  submit.setAttribute('type','submit');
-  submit.innerHTML = 'Save Review';
-  //submit.addEventListener('click',);
-  content.appendChild(submit);
-  //add content to modal
-  modal.appendChild(content);
-  //add modal to restaurant review page
-  const container =  document.getElementById('reviews-container');
-  container.appendChild(modal);
+  window.addEventListener("click", function(event){
+    if(event.target.id == "modal"){
+      modalToggle();
+    }
+  })
+
+  const submit = document.getElementsByClassName('submit-btn')[0];
+  submit.addEventListener('click',function(){
+    const name = document.getElementsByClassName('rvw-reviewer')[0].value;
+    const rating = document.getElementsByClassName('rvw-rate')[0].value;
+    const comment = document.getElementsByClassName('rvw-comment')[0].value;
+
+    DBHelper.saveReview(self.restaurant.id, name, rating, comment, (error, result) => {
+      if(error){
+        console.log(`Error saving review: ${error}`); 
+      }
+      window.location.href=`/restaurant.html?id=${self.restaurant.id}`;
+    });
+  });
 }
 
 /**
@@ -196,10 +195,7 @@ const fillReviewsHTML = (error, reviews) => {
   
   const addReviewLink = document.createElement("a");
   addReviewLink.innerHTML = 'Add Review';
-  addReviewLink.onclick =  function(){
-    let modal = getElementbyId('modal');
-    modal.classList.toggle('show-modal');
-  }
+  addReviewLink.onclick =  modalToggle;
   title.appendChild(addReviewLink);
   container.appendChild(title);
 
@@ -226,7 +222,8 @@ const createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  //need change for date from review server
+  date.innerHTML = new Date(review.createdAt).toDateString();
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -234,7 +231,11 @@ const createReviewHTML = (review) => {
   li.appendChild(rating);
 
   const comments = document.createElement('p');
-  comments.innerHTML = review.comments;
+  if(!review.comments){
+    comments.innerHTML = review.comment;
+  }else{
+    comments.innerHTML = review.comments;
+  }
   li.appendChild(comments);
 
   return li;
