@@ -42,7 +42,7 @@ date: 08/04/18
 self.addEventListener('fetch', function (event) {
     var urlCheck = new URL(event.request.url);
     // console.log(urlCheck.port);
-    if ((urlCheck.port === '1337') && (urlCheck.origin === location.origin)) {
+    if (urlCheck.port === '1337') {
       //go to db and pull resource if there
       //console.log('passed urlCheck');
       handleDatabase(event);
