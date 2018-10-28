@@ -56,6 +56,20 @@ gulp.task('sw', () => {
   .pipe(gulp.dest("./dist"))
 });
 
+// changes for sw dbhelper import
+gulp.task('dbhelper', () => {
+  const b = browserify({
+    debug: true
+  });
+  return b
+  .transform(babelify)
+  .require('app/js/dbhelper.js', {entry:true})
+  .bundle()
+  .pipe(source('dbhelper.js'))
+  .pipe(gulp.dest(".tmp"))
+  .pipe(gulp.dest("./dist"))
+});
+
 // Lint JavaScript
 gulp.task('lint', () =>
    gulp.src(['app/js/**/*.js','app/sw.js','!node_modules/**'])
@@ -69,7 +83,7 @@ function isFixed(file) {
 }
 
 gulp.task('lint-fix', () =>{
-  return gulp.src(['app/sw.js','!node_modules/**'])
+  return gulp.src(['app/sw.js', 'app/js/dbhelper.js', '!node_modules/**'])
   .pipe($.eslint({
     fix: true,
   }))
@@ -139,7 +153,7 @@ gulp.task('styles', () => {
 // to enable ES2015 support remove the line `"only": "gulpfile.babel.js",` in the
 // `.babelrc` file.
 gulp.task('scripts', () =>
-    gulp.src('./app/js/**/*.js')
+    gulp.src(['./app/js/**/*.js'])
       .pipe($.newer('.tmp/js'))
       .pipe($.sourcemaps.init())
       .pipe($.babel())
@@ -222,11 +236,11 @@ gulp.task('serve:dist', ['default'], () =>
 // Build production files, the default task
 gulp.task('default', ['clean'], cb =>
   runSequence(
-    'styles',
-    ['sw', 'lint', 'html', 'scripts', 'images', 'copy'],
+    'copy',
+    ['lint', 'html', 'styles','scripts', 'images'],
     //'lint-fix',
     //'generate-service-worker',
-    //cb
+    cb
   )
 );
 

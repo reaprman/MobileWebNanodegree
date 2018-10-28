@@ -1,5 +1,3 @@
-/* 
-import idb from 'idb'
 const review_database = 'review-db';
 const dbReviews = idb.open(review_database, 1, upgradeDb => {
   switch (upgradeDb.oldVersion) {
@@ -7,10 +5,10 @@ const dbReviews = idb.open(review_database, 1, upgradeDb => {
       let keyValStore = upgradeDb.createObjectStore('reviews', {keypath: ''});
       keyValStore.createIndex('restaurant_id', 'restaurant_id');
   }
-}); */
+});
 
 let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-let type = connection.type;
+let type = connection.effectiveType;
 let networkStatus = true;
 
 
@@ -231,7 +229,7 @@ class DBHelper {
    * 
    */
   static updateConnectionStatus() {
-    if((type == 'none') && (connection.type == ' none')){
+    if((type == 'none') && (connection.effectiveType == 'none')){
       console.log("Connection has been lost");
       networkStatus = false;
     } else {
@@ -239,15 +237,18 @@ class DBHelper {
       networkStatus = true;
       //check for pending updates need more code under here
     }
-    console.log("Connection type changed from " + type + " to " + connection.type);
-    type = connection.type;
+    console.log("Connection type changed from " + type + " to " + connection.effectiveType);
+    type = connection.effectiveType;
   }
 
   /**
    * Add new and Update old review
    */
   static addUpdateReviewIDB(review) {
-
+    dbReviews.then(db => {
+      return db.transaction(review_database, 'readwrite')
+      .objectStore(review_database).put()
+    })
   }
 
   /**
