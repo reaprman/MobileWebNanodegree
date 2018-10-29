@@ -1,8 +1,9 @@
 const review_database = 'review-db';
+const review_store = 'reviews';
 const dbReviews = idb.open(review_database, 1, upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
-      let keyValStore = upgradeDb.createObjectStore('reviews', {keypath: ''});
+      let keyValStore = upgradeDb.createObjectStore(review_store, { keypath: 'id' });
       keyValStore.createIndex('restaurant_id', 'restaurant_id');
   }
 });
@@ -225,6 +226,33 @@ class DBHelper {
     return (networkStatus === true) ?true :false;
   }
 
+  static networkReconnectAddReview(){
+    dbReviews.then(db => {
+      return db.transaction(review_store)
+      .objectStore(review_store).getAll();
+    }).then(results => {
+      let reviews = results.filter(result => result.offlineFlag == true);
+      reviews.forEach(review => {
+        DBHelper.saveNewReview(review, (error, result) =>{
+          if(error){
+            callback(error, null);
+            return;
+          }
+          callback(null, result);
+        });
+      })
+    }).catch(err => {
+      callback(err,null);
+    })
+  }
+
+  /**
+   * 
+   */
+  static networkReconnect(){
+    DBHelper.networkReconnectAddReview();
+  }
+
   /**
    * 
    */
@@ -236,6 +264,7 @@ class DBHelper {
       console.log("Connection reestablished");
       networkStatus = true;
       //check for pending updates need more code under here
+      DBHelper.networkReconnect();
     }
     console.log("Connection type changed from " + type + " to " + connection.effectiveType);
     type = connection.effectiveType;
@@ -246,8 +275,33 @@ class DBHelper {
    */
   static addUpdateReviewIDB(review) {
     dbReviews.then(db => {
-      return db.transaction(review_database, 'readwrite')
-      .objectStore(review_database).put()
+      console.log('adding review to idb cache');
+      return db.transaction(review_store, 'readwrite')
+      .objectStore(review_store).put(review, review.id)
+    }).then(function() {
+      console.log('Successfully added ')
+    }).catch(error=> {
+      console.log(`Error adding review to idb cache: ${error}`);
+    })
+  }
+
+  /**
+   * 
+   */
+  static saveNewReview(review, callback){
+    const reviewURL = DBHelper.DATABASE_URL_REVIEWS;
+    fetch(reviewURL, {
+      method: 'post',
+      body: JSON.stringify(review)
+    }).then(response => {
+      response.json().then(results => {
+        //call to function to add or update db
+        DBHelper.addUpdateReviewIDB(results);
+        callback(null,results);
+      });
+    }).catch(err => {
+      const error = `Submission to server failed: ${err}`;
+      callback(error,null);
     })
   }
 
@@ -255,7 +309,6 @@ class DBHelper {
    * Save Review 
    */
   static saveReview(id, name, rating, comment,callback) {
-    const reviewURL = DBHelper.DATABASE_URL_REVIEWS;
     const review = {
       restaurant_id: id,
       name: name,
@@ -271,21 +324,16 @@ class DBHelper {
       review.id = tempId;
       review.offlineFlag = true;
       //add review to idb
-      //DBHelper.addUpdateReviewIDB(review);
-      
+      DBHelper.addUpdateReviewIDB(review);
+      return;
     }
-    fetch(reviewURL, {
-      method: 'post',
-      body: JSON.stringify(review)
-    }).then(response => {
-      response.json().then(data => {
-        //call to function to add or update db
-        callback(null,data);
-      });
-    }).catch(err => {
-      const error = `Submission to server failed: ${err}`;
-      callback(error,null);
-    })
+    DBHelper.saveNewReview(review, (error, result) => {
+      if(error){
+        callback(error, null);
+        return;
+      }
+      callback(null, result);
+    });
   }
   /**
    * Fetch reviews by id for resource management
@@ -297,20 +345,29 @@ class DBHelper {
         response.json().then(reviews => {
           if(!reviews){
             callback(error,null);
-          }/* else{
+          }else{
             //deal with reviews that are found...add to idb
             reviews.forEach(review => {
               DBHelper.addUpdateReviewIDB(review);
-            })
-          } */
+            }); 
+          }
           callback(null, reviews);
         });
       }).catch(err => {
-        callback(`Review request failed: Returned ${err}`,null);
+        console.log(`Review request failed: Returned ${err}`);
         //need logic to fetch from idb on error and send data back with callback
+        dbReviews.then(db => {
+          return db.transaction(review_store)
+          .objectStore(review_store).getAll();
+        }).then(results => {
+          let final = results.filter(result => result.restaurant_id == id);
+          callback(null, final);
+        }).catch(err => {
+          callback(err,null)
+        })
       });
   }
 }
 //add event listener for connection change from mozilla.org
-//connection.addEventListener('change', DBHelper.updateConnectionStatus); 
+connection.addEventListener('change', DBHelper.updateConnectionStatus); 
 
