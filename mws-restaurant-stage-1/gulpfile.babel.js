@@ -237,7 +237,7 @@ gulp.task('serve:dist', ['default'], () =>
 gulp.task('default', ['clean'], cb =>
   runSequence(
     'copy',
-    ['lint', 'html', 'styles','scripts', 'images'],
+    ['lint', 'html', 'styles','scripts', 'sw', 'images'],
     //'lint-fix',
     //'generate-service-worker',
     cb

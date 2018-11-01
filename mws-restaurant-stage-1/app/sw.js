@@ -1,11 +1,15 @@
 import idb from 'idb';
 const database = 'restaurant-db';
 const storeName = 'restaurants';
+const review_store = 'reviews';
 
 const dbPromise = idb.open(database, 1, upgradeDb => {
   switch (upgradeDb.oldVersion) {
       case 0:
         upgradeDb.createObjectStore(storeName, { keyPath: 'id' });
+        let keyValStore = upgradeDb.createObjectStore(review_store, { keypath: 'id' });
+        keyValStore.createIndex('restaurant_id', 'restaurant_id');
+
     }
 });
 
@@ -19,8 +23,10 @@ self.addEventListener('install', function(event) {
               '/index.html',
               '/restaurant.html',
               '/manifest.json',
+              '/sw.js',
               '/css/styles.css',
               '/js/dbhelper.js',
+              '/js/idb.js',
               '/js/main.js',
               '/js/restaurant_info.js',
               '/js/sw_register.js',
@@ -60,9 +66,38 @@ self.addEventListener('fetch', function (event) {
       }));
     }
   });
-  
 
-  const handleDatabase = (event) => {
+  const handleReviewEvent = (id, event) => {
+    event.respondWith(
+      dbPromise.then(db => {
+        return db.transaction(review_store)
+        .objectStore(review_store).index('restaurant_id').getAll(id);
+      }).then(reviews => {
+        if(!reviews.length > 0) {
+          return fetch(event.request).then(response => {
+            return response.json();
+          }).then(reviews => {
+             return dbPromise.then(db =>{
+              const tx = db.transaction(review_store, 'readwrite');
+              const revStore = tx.objectStore(review_store);
+              reviews.forEach(review => {
+                revStore.put(review, review.id);
+              });
+              return reviews;
+             });
+          })
+        }else{
+          return reviews;
+        }
+      }).then(finalResponse => {
+        return new Response(JSON.stringify(finalResponse));
+      }).catch(error =>{
+        return new Response(`Error fetching data ${error} ${{status: 500}}`);
+      })
+    )
+  }
+
+  const handleRestaurantEvent= (event) => {
     event.respondWith(
       dbPromise.then(db => {
         return db.transaction(storeName)
@@ -73,11 +108,11 @@ self.addEventListener('fetch', function (event) {
             return response.json();
           }).then(restaurants => {
               return dbPromise.then(db => {
-                var tx = db.transaction(storeName,'readwrite');
-                var restStore = tx.objectStore(storeName);
+                let tx = db.transaction(storeName,'readwrite');
+                let restStore = tx.objectStore(storeName);
                 //console.log(`JSON info for DB: ${restaurants}`);
                 restaurants.forEach(restaurant =>{ 
-                  restStore.put(restaurant);
+                  restStore.put(restaurant, restaurant.id);
                 });
                 return restaurants
               });
@@ -92,4 +127,14 @@ self.addEventListener('fetch', function (event) {
         return new Response(`Error fetching data ${error} ${{status: 500}}`);
       })
     );
+  }
+
+  const handleDatabase = (event) => {
+    if(event.request.url.indexOf("reviews") > -1){
+      const url = new URL(event.request.url);
+      const id = url.searchParams.get("restaurant_id");
+      handleReviewEvent(id, event);
+    }else{
+      handleRestaurantEvent(event);
+    }
   }

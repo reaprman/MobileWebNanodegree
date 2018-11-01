@@ -1,15 +1,16 @@
-const review_database = 'review-db';
+const database = 'restaurant-db';
 const review_store = 'reviews';
-const dbReviews = idb.open(review_database, 1, upgradeDb => {
+const storename = 'restaurants';
+const dbPromise = idb.open(database, 1, upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
+      upgradeDb.createObjectStore(storename, {keypath: 'id'});
       let keyValStore = upgradeDb.createObjectStore(review_store, { keypath: 'id' });
       keyValStore.createIndex('restaurant_id', 'restaurant_id');
   }
 });
 
 let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-let type = connection.effectiveType;
 let networkStatus = true;
 
 
@@ -227,12 +228,13 @@ class DBHelper {
   }
 
   static networkReconnectAddReview(){
-    dbReviews.then(db => {
+    dbPromise.then(db => {
       return db.transaction(review_store)
       .objectStore(review_store).getAll();
     }).then(results => {
       let reviews = results.filter(result => result.offlineFlag == true);
       reviews.forEach(review => {
+      delete review.offlineFlag;
         DBHelper.saveNewReview(review, (error, result) =>{
           if(error){
             callback(error, null);
@@ -257,24 +259,22 @@ class DBHelper {
    * 
    */
   static updateConnectionStatus() {
-    if((type == 'none') && (connection.effectiveType == 'none')){
-      console.log("Connection has been lost");
+    if(!navigator.onLine){
       networkStatus = false;
+      console.log(`Connection has been lost: ${networkStatus}`);
     } else {
-      console.log("Connection reestablished");
       networkStatus = true;
+      console.log(`Connection reestablished: ${networkStatus}`);
       //check for pending updates need more code under here
       DBHelper.networkReconnect();
     }
-    console.log("Connection type changed from " + type + " to " + connection.effectiveType);
-    type = connection.effectiveType;
   }
 
   /**
    * Add new and Update old review
    */
   static addUpdateReviewIDB(review) {
-    dbReviews.then(db => {
+    dbPromise.then(db => {
       console.log('adding review to idb cache');
       return db.transaction(review_store, 'readwrite')
       .objectStore(review_store).put(review, review.id)
@@ -318,7 +318,7 @@ class DBHelper {
     }
     //if connection submit to server else post in idb with flag set for offline
     //DBHelper.checkConnection();
-    if(networkStatus === false){
+    if(networkStatus == false){
       //add flag for offline
       const tempId = new Date().getTime();
       review.id = tempId;
@@ -343,27 +343,24 @@ class DBHelper {
       console.log(reviewURL);
       fetch(reviewURL).then(response => {
         response.json().then(reviews => {
-          if(!reviews){
+          /*if(!reviews){
             callback(error,null);
-          }else{
+          } else{
             //deal with reviews that are found...add to idb
             reviews.forEach(review => {
               DBHelper.addUpdateReviewIDB(review);
-            }); 
-          }
+            });  
+          } */
           callback(null, reviews);
-        });
-      }).catch(err => {
-        console.log(`Review request failed: Returned ${err}`);
-        //need logic to fetch from idb on error and send data back with callback
-        dbReviews.then(db => {
-          return db.transaction(review_store)
-          .objectStore(review_store).getAll();
-        }).then(results => {
-          let final = results.filter(result => result.restaurant_id == id);
-          callback(null, final);
         }).catch(err => {
-          callback(err,null)
+          console.log(`Review request failed: Returned ${err}`);
+          dbPromise.then(db => {
+            return db.transaction(review_store).objectStore(review_store)
+            .index('restaurant_id').getAll(id);
+          }).then(reviews => {
+            callback(null,reviews);
+          })
+          
         })
       });
   }
