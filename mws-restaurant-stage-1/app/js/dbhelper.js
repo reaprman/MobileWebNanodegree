@@ -354,17 +354,16 @@ class DBHelper {
           callback(null, reviews);
         }).catch(err => {
           console.log(`Review request failed: Returned ${err}`);
-          dbPromise.then(db => {
+          /* dbPromise.then(db => {
             return db.transaction(review_store).objectStore(review_store)
             .index('restaurant_id').getAll(id);
           }).then(reviews => {
             callback(null,reviews);
-          })
-          
+          }) */
         })
       });
   }
 }
 //add event listener for connection change from mozilla.org
-connection.addEventListener('change', DBHelper.updateConnectionStatus); 
+connection.addEventListener('change', DBHelper.updateConnectionStatus);
 

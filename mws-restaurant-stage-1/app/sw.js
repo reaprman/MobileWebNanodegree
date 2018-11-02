@@ -73,6 +73,7 @@ self.addEventListener('fetch', function (event) {
         return db.transaction(review_store)
         .objectStore(review_store).index('restaurant_id').getAll(id);
       }).then(reviews => {
+        console.log(`SW-Review info from DB: ${reviews}`);
         if(!reviews.length > 0) {
           return fetch(event.request).then(response => {
             return response.json();
@@ -132,7 +133,7 @@ self.addEventListener('fetch', function (event) {
   const handleDatabase = (event) => {
     if(event.request.url.indexOf("reviews") > -1){
       const url = new URL(event.request.url);
-      const id = url.searchParams.get("restaurant_id");
+      const id = url.searchParams.get("restaurant_id") * 1;
       handleReviewEvent(id, event);
     }else{
       handleRestaurantEvent(event);
