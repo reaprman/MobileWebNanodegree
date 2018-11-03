@@ -276,10 +276,12 @@ class DBHelper {
   static addUpdateReviewIDB(review) {
     dbPromise.then(db => {
       console.log('adding review to idb cache');
-      return db.transaction(review_store, 'readwrite')
-      .objectStore(review_store).put(review, review.id)
+      const tx = db.transaction(review_store, 'readwrite');
+      const store = tx.objectStore(review_store);
+      store.put(review, review.id)
+      return tx.complete;
     }).then(function() {
-      console.log('Successfully added ')
+      console.log(`successfully added ${review} `)
     }).catch(error=> {
       console.log(`Error adding review to idb cache: ${error}`);
     })
