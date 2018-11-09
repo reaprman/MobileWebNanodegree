@@ -270,6 +270,42 @@ class DBHelper {
     }
   }
 
+  static updateRestaurantIDB(restaurant, callback) {
+    //check if offline if so add offline flag to restaurant
+    const favStatus = restaurant.is_favorite;
+    dbPromise.then(db => {
+      return db.transaction(storename, 'readwrite')
+      .objectStore(storename).put(restaurant, restaurant.id);
+    }).then(data => {
+      console.log(`Successfull change of favorite for ${data}`);
+      DBHelper.updateRestaurantByID(data, favStatus, (error, result) => {
+        if(error){
+          callback(error,null);
+          return;
+        }
+        callback(null, result);
+      })
+    }).catch(err => {
+      console.log(`Error updating favorite for: ${err}`);
+      callback(err, null);
+    })
+  }
+
+  static updateRestaurantByID(id, favStatus, callback) {
+    const postUrl = `${DBHelper.DATABASE_URL}/${id}/?is_favorite=${favStatus}`;
+    fetch(postUrl, {method: 'post'})
+    .then(response => {
+      response.json().then(result => {
+      console.log(`Success changing favorite on server: ${result}`);
+      callback(null, result);
+      })
+    }).catch(err => {
+      const error = `Error updating favorite status: ${err}`;
+      console.log(error);
+      callback(error, null);
+    })
+  }
+
   /**
    * Add new and Update old review
    */

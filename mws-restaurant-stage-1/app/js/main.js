@@ -170,20 +170,21 @@ const createRestaurantHTML = (restaurant) => {
   image.alt = restaurant.name;
   li.append(image);
 
+  const restaurantHeader = document.createElement('div');
+  restaurantHeader.className = 'rest-header';
+
   const name = document.createElement('h3');
   name.innerHTML = restaurant.name;
-  li.append(name);
+  restaurantHeader.append(name);
 
-  const favoriteIcon = document.createElement('div');
   const isFavorite = (restaurant["is_favorite"] && restaurant["is_favorite"].toString() === "true") ? true : false;
-  favoriteIcon.className = 'fav-icon';
   const favorite = document.createElement('button');
   favorite.style.background = isFavorite ? `url("/img/like.svg") no-repeat`
     : `url("/img/not-like.svg") no-repeat`;
   favorite.id = `fav-icon-${restaurant.id}`;
   favorite.onclick = event => handleFavClick(restaurant.id, !isFavorite);
-  favoriteIcon.append(favorite);
-  li.append(favoriteIcon);
+  restaurantHeader.append(favorite);
+  li.append(restaurantHeader);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
@@ -194,6 +195,7 @@ const createRestaurantHTML = (restaurant) => {
   li.append(address);
 
   const more = document.createElement('button');
+  more.className = 'submit-btn'
   more.innerHTML = 'Restaurant Details';
   more.onclick = function() {
     window.location.href = DBHelper.urlForRestaurant(restaurant);
@@ -216,6 +218,12 @@ const handleFavClick = (id, favStatus) => {
     fav.setAttribute('aria-label', `${restaurant.name} favorite`);
     fav.style.background = `url(/img/like.svg) no-repeat`;
   }
+  DBHelper.updateRestaurantIDB(restaurant, (error, result) => {
+    if(error){
+      console.log(`Error updating favorite status for ${restaurant.name}: ${error}`);
+    }
+    console.log(result)
+  });
   fav.onclick = event => handleFavClick(id, !favStatus);
 }
 

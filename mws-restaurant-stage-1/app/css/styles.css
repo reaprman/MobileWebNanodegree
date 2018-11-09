@@ -293,12 +293,23 @@ nav h1 a {
   margin: 20px 0 10px;
   text-transform: uppercase;
 }
+#restaurants-list li h3 {
+  white-space: nowrap;
+}
+#restaurants-list li .rest-header button {
+  max-width: 25px;
+  margin-left: 50px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  border: none;
+}
 #restaurants-list p {
   margin: 0;
   font-size: 11pt;
 }
-#restaurants-list li button {
-  background-color: orange;
+#restaurants-list li .submit-btn {
+  background-color: #f58500;
   color: #fff;
   display: inline-block;
   font-size: 10pt;
@@ -307,6 +318,11 @@ nav h1 a {
   text-decoration: none;
   text-transform: uppercase;
   border: none;
+}
+.rest-header {
+  display: flex;
+  margin-top: 10px;
+  justify-content: center;
 }
 
 /* ====================== Restaurant Details ====================== */
