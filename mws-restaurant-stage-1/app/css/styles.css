@@ -296,9 +296,9 @@ nav h1 a {
 #restaurants-list li h3 {
   white-space: nowrap;
 }
-#restaurants-list li .rest-header button {
+#restaurants-list li .rest-header button, #restaurant-container .rest-header button {
   max-width: 25px;
-  margin-left: 50px;
+  margin-left: 40px;
   width: 30px;
   height: 30px;
   cursor: pointer;
@@ -310,7 +310,7 @@ nav h1 a {
 }
 #restaurants-list li .submit-btn {
   background-color: #f58500;
-  color: #fff;
+  color: #030303;
   display: inline-block;
   font-size: 10pt;
   margin: 15px 0 0;
@@ -323,6 +323,7 @@ nav h1 a {
   display: flex;
   margin-top: 10px;
   justify-content: center;
+  margin: 15px 0 15px;
 }
 
 /* ====================== Restaurant Details ====================== */
@@ -359,7 +360,6 @@ nav h1 a {
   font-size: 20pt;
   font-weight: 200;
   letter-spacing: 0;
-  margin: 15px 0 30px;
   text-transform: uppercase;
   line-height: 1.1;
 }
@@ -404,6 +404,15 @@ nav h1 a {
   font-weight: 300;
   letter-spacing: -1px;
   padding-bottom: 1pt;
+}
+.rvw-header {
+  display: flex;
+}
+.add-link {
+  text-decoration: underline;
+  right: 30px;
+  position: absolute;
+  line-height: 50px;
 }
 #reviews-list {
   margin: 0;

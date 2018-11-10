@@ -181,6 +181,11 @@ const createRestaurantHTML = (restaurant) => {
   const favorite = document.createElement('button');
   favorite.style.background = isFavorite ? `url("/img/like.svg") no-repeat`
     : `url("/img/not-like.svg") no-repeat`;
+  if(isFavorite){
+    favorite.setAttribute('aria-label', `${restaurant.name} favorite`);
+  }else{
+    favorite.setAttribute('aria-label', `${restaurant.name} not favorite`);
+  }
   favorite.id = `fav-icon-${restaurant.id}`;
   favorite.onclick = event => handleFavClick(restaurant.id, !isFavorite);
   restaurantHeader.append(favorite);

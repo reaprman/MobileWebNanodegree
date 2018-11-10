@@ -83,6 +83,20 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
+  const restHeader = document.getElementsByClassName('rest-header')[0];
+  const isFavorite = (restaurant["is_favorite"] && restaurant["is_favorite"].toString() === "true") ? true : false;
+  const favorite = document.createElement('button');
+  favorite.style.background = isFavorite ? `url("/img/like.svg") no-repeat`
+    : `url("/img/not-like.svg") no-repeat`;
+    if(isFavorite){
+      favorite.setAttribute('aria-label', `${restaurant.name} favorite`);
+    }else{
+      favorite.setAttribute('aria-label', `${restaurant.name} not favorite`);
+    }
+  favorite.id = `fav-icon-${restaurant.id}`;
+  favorite.onclick = event => handleFavClick(restaurant.id, !isFavorite);
+  restHeader.appendChild(favorite);  
+
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
@@ -113,6 +127,27 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   // create review modal
   fillReviewModal();
   
+}
+
+const handleFavClick = (id, favStatus) => {
+  const fav = document.getElementById(`fav-icon-${id}`);
+  console.log(`onclick info: ${self.restaurant[id]}`);
+  let restaurant = self.restaurant;
+  restaurant["is_favorite"] = favStatus;
+  if(!favStatus) {
+    fav.setAttribute(`${restaurant.name} not favorite`);
+    fav.style.background = `url(/img/not-like.svg) no-repeat`;
+  } else {
+    fav.setAttribute('aria-label', `${restaurant.name} favorite`);
+    fav.style.background = `url(/img/like.svg) no-repeat`;
+  }
+  DBHelper.updateRestaurantIDB(restaurant, (error, result) => {
+    if(error){
+      console.log(`Error updating favorite status for ${restaurant.name}: ${error}`);
+    }
+    console.log(result)
+  });
+  fav.onclick = event => handleFavClick(id, !favStatus);
 }
 /**
  * Function to toggle display of modal window
@@ -190,14 +225,19 @@ const fillReviewsHTML = (error, reviews) => {
   self.restaurant.reviews = reviews;
 
   const container = document.getElementById('reviews-container');
+  const reviewHeader = document.createElement('div');
+  reviewHeader.className = 'rvw-header';
+
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
+  reviewHeader.appendChild(title);
   
   const addReviewLink = document.createElement("a");
   addReviewLink.innerHTML = 'Add Review';
+  addReviewLink.className = 'add-link';
   addReviewLink.onclick =  modalToggle;
-  title.appendChild(addReviewLink);
-  container.appendChild(title);
+  reviewHeader.appendChild(addReviewLink);
+  container.appendChild(reviewHeader);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
