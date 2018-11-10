@@ -237,14 +237,14 @@ class DBHelper {
       delete review.offlineFlag;
         DBHelper.saveNewReview(review, (error, result) =>{
           if(error){
-            console.log(`Save review error on reconnect: ${error}`);
+            callback(error, null);
+            return;
           }
-          console.log(`Review saved: ${result}`);
-          return;
+          callback(null, result);
         });
       })
     }).catch(err => {
-      console.log(err);
+      callback(err,null);
     })
   }
 
@@ -309,21 +309,21 @@ class DBHelper {
   /**
    * Add new and Update old review
    */
-  static addUpdateReviewIDB(review, callback) {
+  static addUpdateReviewIDB(review) {
     dbPromise.then(db => {
       console.log('adding review to idb cache');
-      return db.transaction(review_store, 'readwrite')
-      .objectStore(review_store).put(review, review.id)
-    }).then(result => {
-      console.log(`successfully added ${result}`);
-      callback(null, result);
-    }).catch(err=> {
-      const error = `Error adding review to idb cache: ${err}`;
-      callback(error, null);
+      const tx = db.transaction(review_store, 'readwrite');
+      const store = tx.objectStore(review_store);
+      store.put(review, review.id)
+      return tx.complete;
+    }).then(function() {
+      console.log(`successfully added ${review} `)
+    }).catch(error=> {
+      console.log(`Error adding review to idb cache: ${error}`);
     })
   }
 
-  /** 
+  /**
    * 
    */
   static saveNewReview(review, callback){
@@ -334,17 +334,12 @@ class DBHelper {
     }).then(response => {
       response.json().then(results => {
         //call to function to add or update db
-        DBHelper.addUpdateReviewIDB(results, (error, results) => {
-          if(error){
-            callback(error, null);
-            return;
-          }
-          callback(null,results);
-        });
-      }).catch(err => {
-        console.log(`Fetch Post Error: ${err}`);
-        callback(error,null);
-    })
+        DBHelper.addUpdateReviewIDB(results);
+        callback(null,results);
+      });
+    }).catch(err => {
+      const error = `Submission to server failed: ${err}`;
+      callback(error,null);
     })
   }
 
@@ -367,14 +362,8 @@ class DBHelper {
       review.id = tempId;
       review.offlineFlag = true;
       //add review to idb
-      DBHelper.addUpdateReviewIDB(review, (error, results) => {
-        if(error){
-          callback(error, null);
-          return;
-        }
-        callback(null, results);
-      });
-      return;  
+      DBHelper.addUpdateReviewIDB(review);
+      return;
     }
     DBHelper.saveNewReview(review, (error, result) => {
       if(error){
