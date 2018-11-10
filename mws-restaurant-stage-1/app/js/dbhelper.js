@@ -227,14 +227,14 @@ class DBHelper {
     return (networkStatus === true) ?true :false;
   }
 
-  static networkReconnectAddReview(){
+  static networkReconnectAddReview(callback){
     dbPromise.then(db => {
       return db.transaction(review_store)
       .objectStore(review_store).getAll();
     }).then(results => {
       let reviews = results.filter(result => result.offlineFlag == true);
       reviews.forEach(review => {
-      delete review.offlineFlag;
+        delete review.offlineFlag;
         DBHelper.saveNewReview(review, (error, result) =>{
           if(error){
             callback(error, null);
@@ -248,11 +248,30 @@ class DBHelper {
     })
   }
 
+  static networkReconnectAddFavorites(callback){
+    dbPromise.then(db => {
+      return db.transaction(storename)
+      .objectStore(storename).getAll();
+    }).then(results => {
+      let restaurants = results.filter(result => result.offlineFlag == true);
+      restaurants.forEach(restaurant => {
+        delete restaurant.offlineFlag;
+        DBHelper.updateRestaurantByID(restaurant.id, restaurant.is_favorite, (error, result) => {
+          if(error){
+            console.log(error);
+          }
+          console.log(result);
+        });
+      })
+    }).catch(err => callback(err,null));
+  }
+
   /**
    * 
    */
   static networkReconnect(){
     DBHelper.networkReconnectAddReview();
+    DBHelper.networkReconnectAddFavorites();
   }
 
   /**
@@ -272,6 +291,10 @@ class DBHelper {
 
   static updateRestaurantIDB(restaurant, callback) {
     //check if offline if so add offline flag to restaurant
+    if(networkStatus == false){
+      restaurant.offlineFlag = true;
+    }
+
     const favStatus = restaurant.is_favorite;
     dbPromise.then(db => {
       return db.transaction(storename, 'readwrite')

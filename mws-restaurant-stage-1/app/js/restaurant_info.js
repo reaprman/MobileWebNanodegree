@@ -135,7 +135,7 @@ const handleFavClick = (id, favStatus) => {
   let restaurant = self.restaurant;
   restaurant["is_favorite"] = favStatus;
   if(!favStatus) {
-    fav.setAttribute(`${restaurant.name} not favorite`);
+    fav.setAttribute('aria-label',`${restaurant.name} not favorite`);
     fav.style.background = `url(/img/not-like.svg) no-repeat`;
   } else {
     fav.setAttribute('aria-label', `${restaurant.name} favorite`);
